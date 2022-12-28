@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.*;
 import java.util.List;
 @Slf4j
 @Service
@@ -14,6 +15,25 @@ import java.util.List;
 public class CustomerServiceImpl  implements CustomerService {
 
     private final CustomerRepository customerRepository;
+
+    private final Clock clock;
+
+    public static ZonedDateTime NOW = ZonedDateTime.of(
+            2000,
+            12,
+            26,
+            14,
+            51,
+            48,
+            0,
+            ZoneId.of("GMT")
+    );
+
+    public void test() {
+        var a = LocalDateTime.now(clock);
+        var b = NOW.toInstant();
+        var c = NOW.getZone();
+    }
 
     @Override
     public List<Customer> findCustomerAll() {
