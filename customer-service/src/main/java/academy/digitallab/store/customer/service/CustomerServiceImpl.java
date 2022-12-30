@@ -7,33 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.*;
 import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CustomerServiceImpl  implements CustomerService {
+public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
-
-    private final Clock clock;
-
-    public static ZonedDateTime NOW = ZonedDateTime.of(
-            2000,
-            12,
-            26,
-            14,
-            51,
-            48,
-            0,
-            ZoneId.of("GMT")
-    );
-
-    public void test() {
-        var a = LocalDateTime.now(clock);
-        var b = NOW.toInstant();
-        var c = NOW.getZone();
-    }
 
     @Override
     public List<Customer> findCustomerAll() {
@@ -48,35 +29,35 @@ public class CustomerServiceImpl  implements CustomerService {
     @Override
     public Customer createCustomer(Customer customer) {
 
-        Customer customerDB = customerRepository.findByNumberID ( customer.getNumberID () );
-        if (customerDB != null){
-            return  customerDB;
+        Customer customerDB = customerRepository.findByNumberID(customer.getNumberID());
+        if (customerDB != null) {
+            return customerDB;
         }
 
         customer.setState("CREATED");
-        customerDB = customerRepository.save ( customer );
+        customerDB = customerRepository.save(customer);
         return customerDB;
     }
 
     @Override
     public Customer updateCustomer(Customer customer) {
         Customer customerDB = getCustomer(customer.getId());
-        if (customerDB == null){
-            return  null;
+        if (customerDB == null) {
+            return null;
         }
         customerDB.setFirstName(customer.getFirstName());
         customerDB.setLastName(customer.getLastName());
         customerDB.setEmail(customer.getEmail());
         customerDB.setPhotoUrl(customer.getPhotoUrl());
 
-        return  customerRepository.save(customerDB);
+        return customerRepository.save(customerDB);
     }
 
     @Override
     public Customer deleteCustomer(Customer customer) {
         Customer customerDB = getCustomer(customer.getId());
-        if (customerDB ==null){
-            return  null;
+        if (customerDB == null) {
+            return null;
         }
         customer.setState("DELETED");
         return customerRepository.save(customer);
@@ -84,6 +65,6 @@ public class CustomerServiceImpl  implements CustomerService {
 
     @Override
     public Customer getCustomer(Long id) {
-        return  customerRepository.findById(id).orElse(null);
+        return customerRepository.findById(id).orElse(null);
     }
 }

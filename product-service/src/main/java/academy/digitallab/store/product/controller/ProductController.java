@@ -3,18 +3,19 @@ package academy.digitallab.store.product.controller;
 import academy.digitallab.store.product.entity.Category;
 import academy.digitallab.store.product.entity.Product;
 import academy.digitallab.store.product.service.ProductService;
+import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,12 +59,6 @@ public class ProductController {
         if (result.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.formatMessage(result));
         }
-        Product productCreate = productService.createProduct(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productCreate);
-    }
-
-    @PostMapping("/test")
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         Product productCreate = productService.createProduct(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(productCreate);
     }
@@ -115,22 +110,5 @@ public class ProductController {
             e.printStackTrace();
         }
         return jsonString;
-    }
-
-    /**
-     * Trabaja solo en nivel Controller
-     * @param ex Excepción capturada de Validation Starter
-     * @return Map de errores que se está cometiendo con Validation Starter
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
     }
 }
