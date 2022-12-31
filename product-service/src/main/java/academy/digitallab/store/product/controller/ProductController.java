@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -63,6 +65,12 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productCreate);
     }
 
+    @PostMapping("/test")
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
+        Product productCreate = productService.createProduct(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productCreate);
+    }
+
     @PutMapping(value = "/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @RequestBody Product product) {
         product.setId(id);
@@ -110,5 +118,23 @@ public class ProductController {
             e.printStackTrace();
         }
         return jsonString;
+    }
+
+    /**
+     * Trabaja solo en nivel Controller
+     *
+     * @param ex Excepción capturada de Validation Starter
+     * @return Map de errores que se está cometiendo con Validation Starter
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }
